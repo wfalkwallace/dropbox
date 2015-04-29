@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/wfalkwallace/dropbox/issues"
   },
-  "homepage": "https://github.com/wfalkwallace/dropbox"
+  "homepage": "https://github.com/wfalkwallace/dropbox",
+  "dependencies": {
+    "express": "^4.12.3"
+  }
 }
