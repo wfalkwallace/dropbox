@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/wfalkwallace/dropbox",
   "dependencies": {
+    "bluebird": "^2.9.25",
     "bluebird-nodeify": "^1.0.0",
     "express": "^4.12.3",
     "mime-types": "^2.0.10",

@@ -6,6 +6,7 @@ let morgan = require('morgan')
 let mime = require('mime-types')
 let rimraf = require('rimraf')
 let mkdirp = require('mkdirp')
+let bluebird = require('bluebird')
 require('songbird')
 
 const NODE_ENV = process.env.NODE_ENV
@@ -44,7 +45,15 @@ app.delete('*', setFileMeta, (req, res, next) => {
 })
 
 app.put('*', setFileMeta, setDirDetails, (req, res, next) => {
+  async () => {
+    await mkdirp.promise(req.dirPath)
 
+    if (!req.isDir) {
+      req.pipe(fs.createReadStream(req.filepath))
+    }
+    res.end()
+
+  }().catch(next)
 })
 
 function setDirDetails(req, res, next) {
@@ -57,7 +66,8 @@ function setDirDetails(req, res, next) {
   let endsWithSlash = filepath.charAt(filepath.length - 1) === path.sep
   let hasExt = path.extname(filepath) !== ''
   req.isDir = endsWithSlash || !hasExt
-  req.dirPath = isDir ? filepath : path.dirname(filepath)
+  req.dirPath = req.isDir ? filepath : path.dirname(filepath)
+  next()
 }
 
 function setFileMeta(req, res, next) {
