@@ -6,7 +6,9 @@ let morgan = require('morgan')
 let mime = require('mime-types')
 let rimraf = require('rimraf')
 let mkdirp = require('mkdirp')
-let bluebird = require('bluebird')
+// let bluebird = require('bluebird')
+// bluebird.longStackTraces()
+// require('longjohn')
 require('songbird')
 
 const NODE_ENV = process.env.NODE_ENV
@@ -49,7 +51,7 @@ app.put('*', setFileMeta, setDirDetails, (req, res, next) => {
     await mkdirp.promise(req.dirPath)
 
     if (!req.isDir) {
-      req.pipe(fs.createReadStream(req.filepath))
+      req.pipe(fs.createWriteStream(req.filepath))
     }
     res.end()
 
