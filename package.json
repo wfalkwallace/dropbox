@@ -1,0 +1,19 @@
+{
+  "name": "dropbox",
+  "version": "1.0.0",
+  "description": "codepath assignment 1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wfalkwallace/dropbox.git"
+  },
+  "author": "Will Falk-Wallace",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wfalkwallace/dropbox/issues"
+  },
+  "homepage": "https://github.com/wfalkwallace/dropbox"
+}
