@@ -5,6 +5,7 @@ let nodeify = require('bluebird-nodeify')
 let morgan = require('morgan')
 let mime = require('mime-types')
 let rimraf = require('rimraf')
+let mkdirp = require('mkdirp')
 require('songbird')
 
 const NODE_ENV = process.env.NODE_ENV
