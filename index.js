@@ -17,6 +17,8 @@ if (NODE_ENV === 'development') {
 }
 app.listen(PORT, () => console.log(`LISTENING AT http://127.0.0.1:${PORT}`))
 
+app.head('*', setFileMeta, setHeaders, (req, res) => res.end())
+
 app.get('*', setFileMeta, setHeaders, (req, res) => {
   if (res.body) {
     res.json(res.body)
@@ -25,7 +27,37 @@ app.get('*', setFileMeta, setHeaders, (req, res) => {
   fs.createReadStream(req.filepath).pipe(res)
 })
 
-app.head('*', setFileMeta, setHeaders, (req, res) => res.end())
+app.delete('*', setFileMeta, (req, res, next) => {
+  async () => {
+    if (!req.stat) {
+      res.send(400, 'Invalid Path')
+      return
+    }
+    if (req.stat && req.stat.isDirectory()) {
+      await rimraf.promise(req.filepath)
+    } else {
+      await fs.promise.unlink(req.filepath)
+    }
+    res.end()
+  }().catch(next)
+})
+
+app.put('*', setFileMeta, setDirDetails, (req, res, next) => {
+
+})
+
+function setDirDetails(req, res, next) {
+    if (req.stat) {
+    req.send(405, 'File Exists')
+    return
+  }
+
+  let filepath = req.filepath
+  let endsWithSlash = filepath.charAt(filepath.length - 1) === path.sep
+  let hasExt = path.extname(filepath) !== ''
+  req.isDir = endsWithSlash || !hasExt
+  req.dirPath = isDir ? filepath : path.dirname(filepath)
+}
 
 function setFileMeta(req, res, next) {
   req.filepath = path.resolve(path.join(ROOT_DIR, req.url))
@@ -48,23 +80,8 @@ function setHeaders(req, res, next) {
       return
     }
 
-    res.setHeader('Content-Length', stat.size)
+    res.setHeader('Content-Length', req.stat.size)
     let contentType = mime.contentType(path.extname(req.filepath))
     res.setHeader('Content-Type', contentType)
   }(), next)
 }
-
-app.delete('*', setFileMeta, (req, res, next) => {
-  async () => {
-    if (!req.stat) {
-      res.send(400, 'Invalid Path')
-      return
-    }
-    if (req.stat && req.stat.isDirectory()) {
-      await rimraf.promise(req.filepath)
-    } else {
-      await fs.promise.unlink(req.filepath)
-    }
-    res.end()
-  }().catch(next)
-})
