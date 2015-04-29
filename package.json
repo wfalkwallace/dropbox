@@ -4,14 +4,14 @@
   "description": "codepath assignment 1",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "bodemon -- index.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/wfalkwallace/dropbox.git"
   },
   "author": "Will Falk-Wallace",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/wfalkwallace/dropbox/issues"
   },
