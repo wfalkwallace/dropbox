@@ -12,7 +12,7 @@ This is a basic Dropbox clone to sync files across multiple remote folders.
 - [x] Client can make PUT requests to create new directories and files with content
 - [x] Client can make POST requests to update the contents of a file
 - [x] Client can make DELETE requests to delete files and folders
-- [ ] Server will serve from `--dir` or cwd as root
+- [x] Server will serve from `--dir` or cwd as root
 - [ ] Client will sync from server over TCP to cwd or CLI `dir` argument
 
 ### Optional

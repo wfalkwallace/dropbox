@@ -6,27 +6,20 @@ let morgan = require('morgan')
 let mime = require('mime-types')
 let rimraf = require('rimraf')
 let mkdirp = require('mkdirp')
-let middleware = require('./middleware')
 // let bluebird = require('bluebird')
 // bluebird.longStackTraces()
 // require('longjohn')
 require('songbird')
 let argv = require('yargs')
-    .default('host', '127.0.0.1')
-    .usage('Usage: bode index.js [options]')
+    .usage('Usage: npm start[options]')
     .help('h')
     .alias('h', 'help')
-    .describe('host', 'Specify a destination host to connect to')
-    .describe('port', 'Specify a destination port to connect to')
-    .describe('url', 'Specify a destination url to connect to')
-    .describe('log', 'Specify a logfile')
-    .alias('l', 'log')
-    .alias('f', 'log')
-    .alias('p', 'port')
-    .alias('u', 'url')
+    .describe('dir', 'Specify a base directory to serve from')
+    .alias('d', 'dir')
     .argv
 const NODE_ENV = process.env.NODE_ENV
 const PORT = process.env.PORT || 8000
+const ROOT_DIR = argv.dir || path.resolve(process.cwd())
 
 let app = express()
 if (NODE_ENV === 'development') {
@@ -93,3 +86,39 @@ app.post('*', middleware.setFileMeta, middleware.setDirDetails, (req, res, next)
 
   }().catch(next)
 })
+
+function setDirDetails(req, res, next) {
+  let filepath = req.filepath
+  let endsWithSlash = filepath.charAt(filepath.length - 1) === path.sep
+  let hasExt = path.extname(filepath) !== ''
+  req.isDir = endsWithSlash || !hasExt
+  req.dirPath = req.isDir ? filepath : path.dirname(filepath)
+  next()
+}
+
+function setFileMeta(req, res, next) {
+  req.filepath = path.resolve(path.join(ROOT_DIR, req.url))
+  if (req.filepath.indexOf(ROOT_DIR) !== 0) {
+    res.send(400, 'Invalid Path')
+    return
+  }
+  fs.promise.stat(req.filepath)
+    .then(stat => req.stat = stat, () => req.stat = null)
+    .nodeify(next)
+}
+
+function setHeaders(req, res, next) {
+  nodeify(async () => {
+    if (req.stat.isDirectory()) {
+      let files = await fs.promise.readdir(req.filepath)
+      res.body = JSON.stringify(files)
+      res.setHeader('Content-Length', res.body.length)
+      res.setHeader('Content-Type', 'application/json')
+      return
+    }
+
+    res.setHeader('Content-Length', req.stat.size)
+    let contentType = mime.contentType(path.extname(req.filepath))
+    res.setHeader('Content-Type', contentType)
+  }(), next)
+}
