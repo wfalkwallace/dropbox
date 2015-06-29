@@ -27,9 +27,9 @@ if (NODE_ENV === 'development') {
 }
 app.listen(PORT, () => console.log(`LISTENING AT http://127.0.0.1:${PORT}`))
 
-app.head('*', middleware.setFileMeta, middleware.setHeaders, (req, res) => res.end())
+app.head('*', setFileMeta, setHeaders, (req, res) => res.end())
 
-app.get('*', middleware.setFileMeta, middleware.setHeaders, (req, res) => {
+app.get('*', setFileMeta, setHeaders, (req, res) => {
   if (res.body) {
     res.json(res.body)
     return
@@ -37,7 +37,7 @@ app.get('*', middleware.setFileMeta, middleware.setHeaders, (req, res) => {
   fs.createReadStream(req.filepath).pipe(res)
 })
 
-app.delete('*', middleware.setFileMeta, (req, res, next) => {
+app.delete('*', setFileMeta, (req, res, next) => {
   async () => {
     if (!req.stat) {
       res.send(400, 'Invalid Path')
@@ -52,7 +52,7 @@ app.delete('*', middleware.setFileMeta, (req, res, next) => {
   }().catch(next)
 })
 
-app.put('*', middleware.setFileMeta, middleware.setDirDetails, (req, res, next) => {
+app.put('*', setFileMeta, setDirDetails, (req, res, next) => {
   async () => {
     if (req.stat) {
       res.send(405, 'File Exists')
@@ -69,7 +69,7 @@ app.put('*', middleware.setFileMeta, middleware.setDirDetails, (req, res, next) 
   }().catch(next)
 })
 
-app.post('*', middleware.setFileMeta, middleware.setDirDetails, (req, res, next) => {
+app.post('*', setFileMeta, setDirDetails, (req, res, next) => {
   async () => {
     if (!req.stat) {
       res.send(405, 'File Does Not Exist')
